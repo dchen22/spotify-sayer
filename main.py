@@ -2,6 +2,7 @@ import pandas as pd
 from speech_recognition import Microphone, Recognizer, UnknownValueError
 import spotipy as sp
 from spotipy.oauth2 import SpotifyOAuth
+import socket
 
 from pepper import *
 
@@ -21,7 +22,7 @@ scope=user-read-private user-read-playback-state user-modify-playback-state
 setup = pd.read_csv('setup.txt', sep='=', index_col=0, header=None)
 client_id = '51602889753b4cea82048248df3d0383'
 client_secret = 'c66bbd5b90e848e992e8c432290b4605'
-device_name = 'conputer'
+device_name = socket.gethostname()  # gets current device name
 redirect_uri = 'https://example.com/asdf/'
 scope = 'user-read-private user-read-playback-state user-modify-playback-state'
 username = 'puggywuggy2'
