@@ -64,8 +64,9 @@ while True:
     """
     print('start while loop')
     with m as source:
-        r.adjust_for_ambient_noise(source=source)  # added duration=1 because apparently faster idk
-        audio = r.listen(source=source)
+        r.adjust_for_ambient_noise(source=source, duration=1)  # added duration=1 because apparently faster idk
+        print('Listening...')
+        audio = r.listen(source=source, timeout=5, phrase_time_limit=5)
 
     print('finished adjusting')
     command = None
@@ -105,6 +106,11 @@ while True:
             else:
                 uri = get_track_uri(spotify=spotify, name=name)
                 play_track(spotify=spotify, device_id=deviceID, uri=uri)
+        elif words[0] == 'playlist':
+            uri = get_playlist_uri(spotify=spotify, name=name)
+            play_album(spotify=spotify, device_id=deviceID, uri=uri)
+        elif words[0] == 'find':
+            pass
         elif words[0] == 'shuffle':
             if name == 'true' or name == 'on':
                 spotify.shuffle(state=True, device_id=deviceID)

@@ -74,6 +74,22 @@ def get_track_and_artist_uri(spotify, track_artist_name):
     return track_artist_uri
 
 
+def get_playlist_uri(spotify: Spotify, name: str) -> str:
+    # Replace all spaces in name with '+'
+    original = name
+    name = name.replace(' ', '+')
+
+    results = spotify.search(q=name, limit=1, type='playlist')
+    if not results['playlists']['items']:
+        raise InvalidSearchError(f'No playlist named "{original}"')
+    playlist_uri = results['playlists']['items'][0]['uri']
+    return playlist_uri
+
+
+def play_track_in_current_playlist(spotify: Spotify, name: str) -> str:
+    pass
+
+
 def play_album(spotify=None, device_id=None, uri=None):
     spotify.start_playback(device_id=device_id, context_uri=uri)
 
