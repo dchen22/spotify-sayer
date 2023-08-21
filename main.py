@@ -1,5 +1,6 @@
 import pandas as pd
 import requests
+import speech_recognition
 import spotipy
 from speech_recognition import Microphone, Recognizer, UnknownValueError
 import spotipy as sp
@@ -62,22 +63,27 @@ while True:
      - the first word will be one of: 'album', 'artist', 'play'
      - then the name of whatever item is wanted
     """
-    print('start while loop')
+    print('----------------------------------------\nBEGIN NEW LOOP')
     with m as source:
+        r.energy_threshold = 400  # need to speak a bit louder (default 300; this eliminates more background noise)
         r.adjust_for_ambient_noise(source=source, duration=1)  # added duration=1 because apparently faster idk
         print('Listening...')
-        audio = r.listen(source=source, timeout=5, phrase_time_limit=5)
+        r.pause_threshold = 1  # wait for 1 second of silence before stopping
+        try:
+            audio = r.listen(source=source, timeout=2, phrase_time_limit=6)  # setting phrase time limit prevents spotipy from registering super long silences
+        except speech_recognition.WaitTimeoutError:
+            continue
 
-    print('finished adjusting')
+
     command = None
     # print(audio.get_raw_data().hex())
     try:
         command = r.recognize_google(audio_data=audio, language='en-US').lower()
-        print('asdlkfjsdf')
+        print('Okay, this is what I heard:')
     except UnknownValueError:
-        print('unknwonevalue')
+        print("I'm not sure I understand.")
         continue
-    print(command)
+    print(f'"{command}"')
     words = command.split()
 
     single_word_commands = ['resume', 'pause', 'skip', 'previous', 'restart']
