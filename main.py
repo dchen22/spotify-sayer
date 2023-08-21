@@ -1,4 +1,6 @@
 import pandas as pd
+import requests
+import spotipy
 from speech_recognition import Microphone, Recognizer, UnknownValueError
 import spotipy as sp
 from spotipy.oauth2 import SpotifyOAuth
@@ -60,11 +62,12 @@ while True:
      - the first word will be one of: 'album', 'artist', 'play'
      - then the name of whatever item is wanted
     """
-    print('asdf')
+    print('start while loop')
     with m as source:
-        r.adjust_for_ambient_noise(source=source)
+        r.adjust_for_ambient_noise(source=source)  # added duration=1 because apparently faster idk
         audio = r.listen(source=source)
 
+    print('finished adjusting')
     command = None
     # print(audio.get_raw_data().hex())
     try:
@@ -73,13 +76,15 @@ while True:
     except UnknownValueError:
         print('unknwonevalue')
         continue
-
     print(command)
     words = command.split()
-    # words = ['play', 'bohemian', 'rhapsody']
+
+    single_word_commands = ['resume', 'pause', 'skip', 'previous', 'restart']
+    single_word_commands = set(single_word_commands)
     if len(words) <= 1:
-        print('Could not understand. Try again')
-        continue
+        if len(words) == 0 or words[0] not in single_word_commands:
+            print('Could not understand. Try again')
+            continue
 
     name = ' '.join(words[1:])
     try:
@@ -100,7 +105,43 @@ while True:
             else:
                 uri = get_track_uri(spotify=spotify, name=name)
                 play_track(spotify=spotify, device_id=deviceID, uri=uri)
-        else:
-            print('Specify either "album", "artist" or "play". Try Again')
+        elif words[0] == 'shuffle':
+            if name == 'true' or name == 'on':
+                spotify.shuffle(state=True, device_id=deviceID)
+            elif name == 'false' or name == 'off':
+                spotify.shuffle(state=False, device_id=deviceID)
+            else:
+                print('Did you mean "shuffle on/off"?')
+        elif words[0] == 'resume':
+            try:
+                spotify.start_playback(device_id=deviceID)
+            except (spotipy.SpotifyException, requests.HTTPError) as e:
+                print('Error - playback may already be playing')
+        elif words[0] == 'pause':
+            try:
+                spotify.pause_playback(device_id=deviceID)
+            except (spotipy.SpotifyException, requests.HTTPError) as e:
+                print('Error - playback may already be paused')
+        elif words[0] == 'skip':
+            spotify.next_track(device_id=deviceID)
+        elif words[0] == 'previous':
+            spotify.previous_track(device_id=deviceID)
+        elif words[0] == 'restart':
+            spotify.seek_track(position_ms=0)
+        elif words[0] == 'volume':
+            current_playback = spotify.current_playback()
+            current_volume = current_playback['device']['volume_percent']
+            d_volume = 10  # how much we're changing by
+            if name == 'up':
+                if current_volume <= 100 - d_volume:
+                    spotify.volume(current_volume + d_volume, device_id=deviceID)
+                else:
+                    spotify.volume(100, device_id=deviceID)
+            elif name == 'down':
+                if current_volume >= d_volume:
+                    spotify.volume(current_volume - d_volume, device_id=deviceID)
+                else:
+                    spotify.volume(0, device_id=deviceID)
+
     except InvalidSearchError:
         print('InvalidSearchError. Try Again')
