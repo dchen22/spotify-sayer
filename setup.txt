@@ -1,0 +1,6 @@
+client_id=51602889753b4cea82048248df3d0383
+client_secret=c66bbd5b90e848e992e8c432290b4605
+device_name=conputer
+redirect_uri=https://example.com/callback/
+username=puggywuggy2
+scope=user-read-private user-read-playback-state user-modify-playback-state
