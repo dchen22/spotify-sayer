@@ -18,7 +18,7 @@ scope=user-read-private user-read-playback-state user-modify-playback-state
 """
 
 # Set variables from setup.txt
-setup = pd.read_csv('C:/Users/denis/Desktop/codestuff/spotify-sayer/setup.txt', sep='=', index_col=0, header=None)
+setup = pd.read_csv('setup.txt', sep='=', index_col=0, header=None)
 client_id = '51602889753b4cea82048248df3d0383'
 client_secret = 'c66bbd5b90e848e992e8c432290b4605'
 device_name = 'conputer'
